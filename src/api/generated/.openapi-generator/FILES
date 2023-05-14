@@ -1,0 +1,13 @@
+.gitignore
+.npmignore
+api.ts
+api/contribution-controller-api.ts
+base.ts
+common.ts
+configuration.ts
+git_push.sh
+index.ts
+model/add-contribution-request.ts
+model/contribution.ts
+model/index.ts
+model/update-contribution-request.ts
