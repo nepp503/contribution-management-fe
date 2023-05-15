@@ -40,9 +40,6 @@ export const ContributionsMain: React.FC = () => {
     const deleteContributionById = React.useCallback(async (id: number | undefined) => {
         if (id) {
             await runDeleteContribution({id: id})
-            setContributionId(null)
-            setUserId(null)
-            setContributions([])
         }
     }, [runDeleteContribution, setContributions])
 
