@@ -1,19 +1,22 @@
 import * as React from 'react';
 import { useAsyncMethod } from '../hooks/useAsyncMethod';
-import { deleteContribution, getContribution, getContributionByUser, updateContribution } from '../api/contributionApi';
+import { deleteContribution, getContribution, getContributionByUser } from '../api/contributionApi';
 import { Box, Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField } from '@mui/material';
 import { useState } from 'react';
 import { Close, Create, GetApp } from '@mui/icons-material';
 import { Contribution } from '../api/generated';
+import { ChangeContributionDialog } from './ChangeContributionDialog';
 
 export const ContributionsMain: React.FC = () => {
     const [contributionId, setContributionId] = useState<number|null>(null)
     const [userId, setUserId] = useState<number|null>(null)
-    const [contributions, setContributions] = useState<Contribution[]>([]) 
+    const [contributions, setContributions] = useState<Contribution[]>([])
+    const [isUpdateContributionDialogOpen, setIsUpdateContributionDialogOpen] = useState<boolean>(false)
+    const [chosenContributionId, setChosenContributionId] = useState<number|null>(null)
+
 
     const {run: runGetContribution} = useAsyncMethod(getContribution)
     const {run: runGetContributionByUser} = useAsyncMethod(getContributionByUser)
-    const {run: runUpdateContribution} = useAsyncMethod(updateContribution)
     const {run: runDeleteContribution} = useAsyncMethod(deleteContribution)
 
     const getContributionById = React.useCallback(async () => {
@@ -34,13 +37,6 @@ export const ContributionsMain: React.FC = () => {
         }
     }, [runGetContributionByUser, setContributions, userId])
 
-    const updateContributionContent = React.useCallback(async (id: number | undefined) => {
-        if (id) {
-            const result = (await runDeleteContribution({id: id})).data
-            setContributions([])
-        }
-    }, [runDeleteContribution, setContributions])
-
     const deleteContributionById = React.useCallback(async (id: number | undefined) => {
         if (id) {
             await runDeleteContribution({id: id})
@@ -49,6 +45,17 @@ export const ContributionsMain: React.FC = () => {
             setContributions([])
         }
     }, [runDeleteContribution, setContributions])
+
+    const handleCloseUpdateContributionDialog = () => {
+        setIsUpdateContributionDialogOpen(false)
+    }
+
+    const openUpdateContributionDialog = (id: number|undefined) => {
+        if(id) {
+            setChosenContributionId(id)
+            setIsUpdateContributionDialogOpen(true)
+        }
+    }
       
     return(
         <>
@@ -109,7 +116,7 @@ export const ContributionsMain: React.FC = () => {
                                 <TableCell>{item.title}</TableCell>
                                 <TableCell>{item.body}</TableCell>
                                 <TableCell>
-                                    <Button endIcon={<Create fontSize="small" />} onClick={() => updateContributionContent(item.id)} />
+                                    <Button endIcon={<Create fontSize="small" />} onClick={() => openUpdateContributionDialog(item.id)} />
                                     <Button endIcon={<Close fontSize="small" />} onClick={() => deleteContributionById(item.id)} />
                                 </TableCell>
                             </TableRow>
@@ -117,6 +124,14 @@ export const ContributionsMain: React.FC = () => {
                     </TableBody>
                 </Table>
             </TableContainer>
+
+            {isUpdateContributionDialogOpen && (
+                <ChangeContributionDialog
+                    id={chosenContributionId}         
+                    open={isUpdateContributionDialogOpen}
+                    onClose={handleCloseUpdateContributionDialog}
+                />
+            )}
         </>
     )
 }
