@@ -41,7 +41,7 @@ export const ContributionsMain: React.FC = () => {
         if (id) {
             await runDeleteContribution({id: id})
         }
-    }, [runDeleteContribution, setContributions])
+    }, [runDeleteContribution])
 
     const handleCloseUpdateContributionDialog = () => {
         setIsUpdateContributionDialogOpen(false)
